@@ -6,18 +6,11 @@ import AddPhrase from './component/phrase';
 import "./index.css"
 
 function App() {
-
-  const positionEl = document.querySelector("#position strong");
-  const artistSpan = document.querySelector("#artist span");
-  const songSpan = document.querySelector("#song span");
-
-  const div = document.createElement("div");
-
   const animateWord = (now, unit) => {
     if (unit.contains(now)) {
-      document.querySelector("#text").textContent = unit.text;
+      document.querySelector(".text").textContent = unit.text;
       const content = document.createTextNode(unit.text)
-      document.querySelector(".phrase").textContent = content.textContent
+      // document.querySelector(".phrase").textContent = content.textContent
       
     }
   };
@@ -26,17 +19,31 @@ function App() {
   const player = new Player({
     app: {
       token: "zTmodBTGeXC5AZgO",
+      parameters: [
+        {title: "Gradation start color", name: "gradationStartcolor", className: "Color", initialValue: "#63d0e2"},
+        {title: "Gradation end color", name: "gradationEndColor", className: "color", initialValue: "#ff9438"}
+      ]
     },
     mediaElement: document.querySelector("#media"),
+    mediaBannerPosition: "bottom right",
   });
+
+  const overlay = document.querySelector("#overlay");
+  const bar = document.querySelector("#bar");
+  const textContainer = document.querySelector("#text")
+  const seekbar = document.querySelector("#seekbar")
+  const paintedSeekbar = seekbar.querySelector("div")
+  let b, c;
   
   // Register event listeners
   player.addListener({
     onAppReady,
+    onAppParameterUpdate,
+    onAppMediaChange,
     onVideoReady,
     onTimerReady,
     onThrottledTimeUpdate,
-    onPlay,
+    // onPlay,
     onPause,
     onStop,
   });
@@ -46,96 +53,54 @@ function App() {
    *
    * @param {IPlayerApp} app - https://developer.textalive.jp/packages/textalive-app-api/interfaces/iplayerapp.html
    */
-
-
-  function onAppReady(app) {
-  
-    // Show control if this app is launched standalone (not connected to a TextAlive host)
-    if (!app.managed) {
-      document.querySelector("#control").style.display = "block";
-    }
-  
-    // Load a song when a song URL is not specified
-    if (!app.songUrl) {
-      player.createFromSongUrl("https://piapro.jp/t/FDb1/20210213190029", {
-        video: {
-          // 音楽地図訂正履歴: https://songle.jp/songs/2121525/history
-          beatId: 3953882,
-          repetitiveSegmentId: 2099561,
-          // 歌詞タイミング訂正履歴: https://textalive.jp/lyrics/piapro.jp%2Ft%2FFDb1%2F20210213190029
-          lyricId: 52065,
-          lyricDiffId: 5093,
-        },
-      });
-    }
+  const onAppReady = (app) => {
+      if (app.managed) {
+          document.querySelector("#control").className = "disabled";
+      }
+      if (!app.songUrl) {
+          document.querySelector("#media").className = "disabled";
+          
+          // default song
+          player.createFronSongUrl("https://piapro.jp/t/FDb1/20210213190029", {
+              video:{
+                  beatId: 3953882,
+                  repetitiveSegmentId: 2099561,
+                  lyricId: 52065,
+                  lyricDiffId: 5093,
+              },
+          });
+      }
   }
-  
-  /**
-   * 
-   *
-   * @param {IVideo} v - https://developer.textalive.jp/packages/textalive-app-api/interfaces/ivideo.html
-   */
 
-  function onVideoReady(v) {
-    // Show meta data
-    artistSpan.textContent = player.data.song.artist.name;
-    songSpan.textContent = player.data.song.name;
-
-    
-  
-    // Set "animate" function
-    let beats = player.getBeats()
-    let w = player.video.firstPhrase;
-
-    while (w) {
-      w.animate = animateWord;
-      w = w.next;
-
-     
-    }
+  const onAppParameterUpdate = () => {
+    const params = player.app.options.parameters;
+    const sc = player.app.parameters.gradationStartColor, scString = sc ? `rgb(${sc.r}, ${sc.g}, ${sc.b})` : params[0].initialValue;
+    const ec = player.app.parameters.gradationEndColor, ecString = ec ? `rgb(${ec.r}, ${ec.g}, ${ec.b})` : params[1].initialValue;
+    document.body.style.backgroundColor = ecString;
+    document.body.style.backgroundImage = `linear-gradient(0deg, ${ecString} 0%, ${scString} 100%)`;
   }
-  
-  /**
-   * 
-   *
-   * @param {Timer} t - https://developer.textalive.jp/packages/textalive-app-api/interfaces/timer.html
-   */
-  function onTimerReady(t) {
-
-    // Enable buttons
-    if (!player.app.managed) {
-      document
-        .querySelectorAll("button")
-        .forEach((btn) => (btn.disabled = false));
-    }
-  }
-  
-  /**
-   * 
-   *
-   * @param {number} position - https://developer.textalive.jp/packages/textalive-app-api/interfaces/playereventlistener.html#onthrottledtimeupdate
-   */
 
 
-  function onThrottledTimeUpdate(position) {
-    // Update current position
-    positionEl.textContent = String(Math.floor(position));
-  
-    // More precise timing information can be retrieved by `player.timer.position` at any time
+  const onAppMediaChange = () => {
+    overlay.className = "";
+    bar.className = "";
+    resetChars();
   }
-  
-  // Hide #overlay when music playback started
-  function onPlay() {
-    
+
+
+  const onVideoReady = (video) => {
+    document.querySelector("#artist span").textContent = player.data.song.artist.name;
+    document.querySelector("#song span").textContent = player.data.song.name;
+
+    c = null
   }
-  
-  // Reset lyrics text field when music playback is paused or stopped
-  function onPause() {
-    document.querySelector("#text").textContent = "-";
+
+  const onTimerReady = () => {
+    overlay.className = "disabled";
+    document.querySelector("#control > a#play").className = "";
+    document.querySelector("#control > a#stop").className = "";
   }
-  function onStop() {
-    document.querySelector("#text").textContent = "-";
-  }
+
 
   return (
     <>
@@ -143,7 +108,7 @@ function App() {
     <div id="container">
       <div>
         <p id="lyrics">
-          <span id="text"></span> {/* ここでフレーズを適宜変更している */}
+          <span class="text"></span> {/* ここでフレーズを適宜変更している */}
         </p>
 
           <p class="phrase"></p>
