@@ -1,17 +1,9 @@
-/**
- * TextAlive App API lyric sheet example
- * https://github.com/TextAliveJp/textalive-app-lyric-sheet
- *
- * インタラクティブな歌詞カードを実装した TextAlive App API のサンプルコードです。
- * 発声にあわせて歌詞が表示され、歌詞をクリックするとそのタイミングに再生がシークします。
- * また、このアプリが TextAlive ホストと接続されていなければ再生コントロールを表示します。
- */
-const { Player } = TextAliveApp;
+import { Player } from "textalive-app-api";
 
 // TextAlive Player を初期化
 const player = new Player({
   // トークンは https://developer.textalive.jp/profile で取得したものを使う
-  app: { token: "JY0mLoHiX3lPTJaS", parameters: [
+  app: { token: "zTmodBTGeXC5AZgO", parameters: [
     {title: "Gradation start color", name: "gradationStartColor", className: "Color", initialValue: "#63d0e2" },
     {title: "Gradation end color", name: "gradationEndColor", className: "Color", initialValue: "#ff9438" },
   ] },
@@ -27,7 +19,7 @@ const overlay = document.querySelector("#overlay");
 const bar = document.querySelector("#bar");
 const textContainer = document.querySelector("#text");
 const seekbar = document.querySelector("#seekbar");
-const paintedSeekbar = seekbar.querySelector("div");
+const paintedSeekbar = document.querySelector("#seekbar div");
 let b, c;
 
 player.addListener({
@@ -219,6 +211,7 @@ function newChar(current) {
   // 文字を画面上に追加
   const container = document.createElement("div");
   container.className = classes.join(" ");
+  
   container.appendChild(div);
   container.addEventListener("click", () => {
     player.requestMediaSeek(current.startTime);
