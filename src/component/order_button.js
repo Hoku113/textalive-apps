@@ -1,6 +1,6 @@
 
 // css
-import "../css/button.css"
+// import "../css/button.css"
 
 // start player
 export const PlayButton = (player) => {
