@@ -1,4 +1,17 @@
+import { useRef, useState } from "react";
+import { Stage, Layer} from "react-konva";
+import GetImage from "./draggedImage";
+
+
 const Recoder = () => {
+
+  const dragImage = useRef();
+  const stageRef = useRef();
+  const [images, setImages] = useState([])
+
+  console.log(dragImage)
+  console.log(stageRef)
+
 
     const dragEnter = (e) => {
         console.log('on drag enter', e);
@@ -13,8 +26,20 @@ const Recoder = () => {
       };
     
       const Drop = (e) => {
-        console.log('on drop', e);
+        console.log('on drop');
         if (e.currentTarget.id === 'drop-zone') {
+
+          console.log("start")
+          e.preventDefault();
+
+          stageRef.current.setPointersPositions(e);
+
+          setImages(
+            images.concat([{
+              ...stageRef.current.getPointerPosition(),
+              src: dragImage.current
+            }])
+          )
         }
       };
 
@@ -24,15 +49,26 @@ const Recoder = () => {
             id="drop-zone"
             onDragEnter={dragEnter}
             onDragLeave={dragLeave}
-            onDragOer={(e) => {
+            onDragOver={(e) => {
                 e.preventDefault();
             }}
             onDrop={Drop}
             >
-
-                drop zone {/*この部分はレコードを設置する部分*/}
-
+              <Stage
+                width={window.innerWidth}
+                height={window.innerHeight}
+                style={{border: "1px solid grey"}}
+                ref={stageRef}
+              >
+                <Layer>
+                  {images.map((image) => {
+                    return <GetImage image={image}></GetImage>
+                  })}
+                </Layer>
+              </Stage>
             </div>
+
+
         </>
     )
 }

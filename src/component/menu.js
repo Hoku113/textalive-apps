@@ -8,11 +8,6 @@ import Divider from '@mui/material/Divider';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import InboxIcon from '@mui/icons-material/Inbox';
-import MailIcon from '@mui/icons-material/Mail';
-
-import "tailwindcss"
 
 // record image
 import record1 from "../asset/records/record.jpg"
@@ -61,7 +56,7 @@ const Menu = () => {
                     <ListItem disablePadding>
                         <ListItemButton>
                             <ListItemIcon>
-                                <img src={record} alt=""></img>
+                                <img src={record} alt={record}></img>
                             </ListItemIcon>
                         </ListItemButton>
                     </ListItem>
@@ -83,6 +78,7 @@ const Menu = () => {
                             open={state[anchor]}
                             onClose={toggleDrawer(anchor, false)}
                             onOpen={toggleDrawer(anchor, true)}
+                            onDrag={toggleDrawer(anchor, false)}
                         >
                             {list(anchor)}
                         </SwipeableDrawer>
