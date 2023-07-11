@@ -4,7 +4,7 @@ import './index.css';
 import reportWebVitals from './reportWebVitals';
 
 // import component
-import Menu from './component/menu';
+// import Menu from './component/menu';
 import Recoder from './component/recorder';
 import Sing from './component/sing';
 
@@ -13,7 +13,7 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <Sing/>
-    <Menu/>
+    {/* <Menu/> */}
     <Recoder/>
   </React.StrictMode>
 );

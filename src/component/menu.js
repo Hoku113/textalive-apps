@@ -8,25 +8,9 @@ import Divider from '@mui/material/Divider';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
+import { Buffer } from "buffer";
 
-// record image
-import record1 from "../asset/records/record.jpg"
-import record2 from "../asset/records/record1.jpg"
-import record3 from "../asset/records/record2.jpg"
-import record4 from "../asset/records/record3.jpg"
-import record5 from "../asset/records/record4.jpg"
-import record6 from "../asset/records/record5.jpg"
-
-const Menu = () => {
-
-    const [records, setRecords] = useState([
-        record1,
-        record2,
-        record3,
-        record4,
-        record5,
-        record6,
-    ])
+const Menu = (records) => {
 
     const [state, setState] = React.useState({
         right: false,
@@ -52,11 +36,14 @@ const Menu = () => {
             onKeyDown={toggleDrawer(anchor, false)}
         >
             <List>
-                {records.map((record) => (
+                {Object.values(records).map((record) => (
                     <ListItem disablePadding>
                         <ListItemButton>
                             <ListItemIcon>
-                                <img src={record} alt={record}></img>
+                                for(let i; i < record.length ; i++){
+                                    
+                                }
+                                <img src={Buffer.from(record, "base64url").toString()} alt=""></img>
                             </ListItemIcon>
                         </ListItemButton>
                     </ListItem>
